@@ -1,0 +1,34 @@
+desktopvirtualizationresources
+| where type == "microsoft.desktopvirtualization/hostpools/sessionhosts"
+| extend props = parse_json(properties)
+| extend rscArray = split(props.resourceId, '/')
+| extend vmName = rscArray[array_length(rscArray) - 1]
+| extend vmid = tostring(props.resourceId)
+| extend vmStatus = tostring(props.status)
+| extend assignedUser = props.assignedUser
+| project  vmName, vmid , assignedUser, vmStatus
+| join kind=leftouter(
+    resources
+    | where type == "microsoft.compute/virtualmachines" or type == "microsoft.network/networkinterfaces"
+    | extend vmId = id
+    | extend nicId = tostring(properties.networkProfile.networkInterfaces[0].id)
+    | extend privateIP = tostring(properties.ipConfigurations.properties.privateIPAddress)
+    | join kind=leftouter(
+        resources
+        | where type == "microsoft.network/networkinterfaces"
+    )
+    on $left.nicId == $right.id
+)
+on $left.vmid == $right.vmId
+| project vmName, vmid , assignedUser, vmStatus, nicId, privateIP
+// | union withsource=resources kind=inner
+//     (
+//         resources
+//         | where type == "microsoft.network/networkinterfaces"
+//         | where id == nicId
+//         | extend privateIP = tostring(properties.ipConfigurations.properties.privateIPAddress)
+//     )
+
+
+
+
