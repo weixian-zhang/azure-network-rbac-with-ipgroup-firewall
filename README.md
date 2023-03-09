@@ -2,7 +2,7 @@
 
 ### Problem Statement  
 
-How can be we allow per user-level (per VM) to access only certain VLANs on-premises or certain VNet/Subnets on Azure,  
+How can we allow per user-level (per VM) to access only certain VLANs on-premises or certain VNet/Subnets on Azure,  
 and also having friendly identifier/labelling to each user/VM, so that managing the network firewall rules will be less error-prone
 
 ### Solution  
